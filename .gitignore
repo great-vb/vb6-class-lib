@@ -1,0 +1,7 @@
+#ignore lib
+*.lib
+#ignore exp
+*.exp
+#ignore dll
+*.dll
+
