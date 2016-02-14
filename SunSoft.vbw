@@ -4,3 +4,5 @@ ArrayHelper = 0, 0, 0, 0, C
 CFile = 4, 2, 993, 644, C
 CEmail = 0, 0, 0, 0, C
 CRegExp = 25, 25, 825, 474, C
+DBModel = 25, 25, 920, 474, C
+DbCreateHelper = 50, 50, 945, 499, 
