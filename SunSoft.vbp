@@ -13,6 +13,7 @@ Class=CRegExp; CRegExp.cls
 Class=DBModel; DBModel.cls
 Class=DbCreateHelper; DbCreateHelper.cls
 Class=TimeCounter; TimeCounter.cls
+Class=CString; CString.cls
 Startup="(None)"
 ExeName32="SunSoft.dll"
 Command32=""

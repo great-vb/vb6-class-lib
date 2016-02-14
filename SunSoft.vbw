@@ -7,3 +7,4 @@ CRegExp = 25, 25, 825, 474, C
 DBModel = 25, 25, 920, 474, C
 DbCreateHelper = 50, 50, 945, 499, C
 TimeCounter = 50, 50, 945, 499, 
+CString = 0, 0, 0, 0, C
