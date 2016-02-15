@@ -1,6 +1,8 @@
-AdodbHelper = 100, 100, 884, 533, C
+AdodbHelper = 100, 100, 884, 533, 
 CHashTable = 0, 0, 0, 0, C
 ArrayHelper = 0, 0, 0, 0, C
 CFile = 4, 2, 993, 644, C
 CEmail = 0, 0, 0, 0, C
 CRegExp = 25, 25, 825, 474, C
+DBModel = 0, 0, 0, 0, C
+DbCreateHelper = 0, 0, 0, 0, C

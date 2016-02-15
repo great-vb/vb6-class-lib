@@ -1,9 +1,9 @@
 Type=OleDll
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#C:\Windows\SysWOW64\stdole2.tlb#OLE Automation
-Reference=*\G{AC0714F2-3D04-11D1-AE7D-00A0C90F26F4}#1.0#0#C:\Program Files (x86)\Common Files\Designer\msaddndr.dll#Microsoft Add-In Designer
+Reference=*\G{AC0714F2-3D04-11D1-AE7D-00A0C90F26F4}#1.0#0#C:\Program Files (x86)\VB6Mini\bin\Designers\MSADDNDR\MSADDNDR.TLB#Microsoft Add-In Designer
 Reference=*\G{00000205-0000-0010-8000-00AA006D2EA4}#2.5#0#C:\Program Files (x86)\Common Files\System\ado\msado25.tlb#Microsoft ActiveX Data Objects 2.5 Library
 Reference=*\G{00000600-0000-0010-8000-00AA006D2EA4}#6.0#0#C:\Program Files (x86)\Common Files\System\ado\msadox.dll#Microsoft ADO Ext. 6.0 for DDL and Security
-Reference=*\G{3F4DACA7-160D-11D2-A8E9-00104B365C9F}#5.5#0#C:\Windows\System32\vbscript.dll\3#Microsoft VBScript Regular Expressions 5.5
+Reference=*\G{3F4DACA7-160D-11D2-A8E9-00104B365C9F}#5.5#0#C:\Windows\SysWOW64\vbscript.dll\3#Microsoft VBScript Regular Expressions 5.5
 Class=AdodbHelper; AdodbHelper.cls
 Class=CHashTable; CHashTable.cls
 Class=ArrayHelper; ArrayHelper.cls
