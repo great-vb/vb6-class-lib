@@ -15,7 +15,24 @@ Private Declare Function WideCharToMultiByte Lib "kernel32" (ByVal CodePage As L
 Private WithEvents req As WinHttp.WinHttpRequest
 Attribute req.VB_VarHelpID = -1
 Private canGet As Boolean
-Private Const TIME_OUT = 5
+Private mTimeOut As Long
+Private Const MIN_TIME_OUT = 5
+Private Const MAX_TIME_OUT = 120
+Private Const TIME_OUT_STEP = 10
+'调整大小
+Private Sub mShorterTimeOut()
+  mTimeOut = mTimeOut - TIME_OUT_STEP
+  If mTimeOut <= MIN_TIME_OUT Then
+    mTimeOut = MIN_TIME_OUT
+  End If
+End Sub
+
+Private Sub mLongerTimeOut()
+  mTimeOut = mTimeOut + TIME_OUT_STEP
+  If mTimeOut >= MAX_TIME_OUT Then
+    mTimeOut = MIN_TIME_OUT
+  End If
+End Sub
 '说明：此代码类模块用于获取网页的源代码
 Private Function getHtmlStrGB(ByVal strURL As String) As String   '获取源码
     DoEvents
@@ -24,38 +41,42 @@ Private Function getHtmlStrGB(ByVal strURL As String) As String   '获取源码
     '"获取网页源码"
     Set XmlHttp = CreateObject("Microsoft.XMLHTTP")
     XmlHttp.Open "GET", strURL, True
-    XmlHttp.setRequestHeader "If-Modified-Since", "0"
-    XmlHttp.send
+    XmlHttp.SetRequestHeader "If-Modified-Since", "0"
+    XmlHttp.Send
     stime = Now '获取当前时间
     While XmlHttp.readyState <> 4
         DoEvents
         ntime = Now '获取循环时间
-        If DateDiff("s", stime, ntime) > TIME_OUT Then
+        If DateDiff("s", stime, ntime) > mTimeOut Then
+          Call mLongerTimeOut
           Err.Raise 10001, , "[SunSoft]连接超时"
         End If
     Wend
-    getHtmlStrGB = StrConv(XmlHttp.responseBody, vbUnicode)
+    Call mShorterTimeOut
+
+    getHtmlStrGB = StrConv(XmlHttp.ResponseBody, vbUnicode)
     Set XmlHttp = Nothing
     DoEvents
 End Function
 
 Private Function Utf8ToUnicode(ByRef Utf() As Byte) As String
-    Dim utfLen As Long
-    utfLen = -1
-    On Error Resume Next
-    utfLen = UBound(Utf)
-    If utfLen = -1 Then Exit Function
+  Dim utfLen As Long
+  utfLen = -1
+  On Error Resume Next
+  utfLen = UBound(Utf)
+  If utfLen = -1 Then Exit Function
+  
+  On Error GoTo 0
+  
+  Dim i As Long, j As Long, k As Long, N As Long
+  Dim B As Byte, cnt As Byte
+  Dim Buf() As String
+  ReDim Buf(utfLen)
     
-    On Error GoTo 0
-    
-    Dim i As Long, j As Long, k As Long, N As Long
-    Dim B As Byte, cnt As Byte
-    Dim Buf() As String
-    ReDim Buf(utfLen)
-    
-    i = 0
-    j = 0
+  i = 0
+  j = 0
     Do While i <= utfLen
+
         B = Utf(i)
         
         If (B And &HFC) = &HFC Then
@@ -97,8 +118,12 @@ Private Function Utf8ToUnicode(ByRef Utf() As Byte) As String
             B = Utf(i + k)
             N = N * &H40 + (B And &H3F)
         Next
+        If N < -32768 Or N > 65535 Then
+          Buf(j) = "?"
+        Else
+          Buf(j) = ChrW(N)
+        End If
         
-        Buf(j) = ChrW(N)
 Continued:
         i = i + cnt
         j = j + 1
@@ -115,18 +140,20 @@ Public Function Post(ByVal url As String, ByVal data As String) As String
   '"获取网页源码"
   Set XmlHttp = CreateObject("Microsoft.XMLHTTP")
   XmlHttp.Open "POST", url, True
-  XmlHttp.setRequestHeader "If-Modified-Since", "0"
-  XmlHttp.setRequestHeader "Content-Type", "application/x-www-form-urlencoded"
-  XmlHttp.send data
+  XmlHttp.SetRequestHeader "If-Modified-Since", "0"
+  XmlHttp.SetRequestHeader "Content-Type", "application/x-www-form-urlencoded"
+  XmlHttp.Send data
   stime = Now '获取当前时间
   While XmlHttp.readyState <> 4
     DoEvents
     ntime = Now '获取循环时间
-    If DateDiff("s", stime, ntime) > TIME_OUT Then
+    If DateDiff("s", stime, ntime) > mTimeOut Then
+      Call mLongerTimeOut
       Err.Raise 10001, , "[SunSoft]连接超时"
     End If
   Wend
-  Post = StrConv(XmlHttp.responseBody, vbUnicode)
+  Call mShorterTimeOut
+  Post = StrConv(XmlHttp.ResponseBody, vbUnicode)
   Set XmlHttp = Nothing
   DoEvents
 End Function
@@ -140,19 +167,21 @@ Private Function getHtmlStrUTF(ByVal strURL As String) As String   '获取源码
     ' St "获取网页源码"
     Set XmlHttp = CreateObject("Microsoft.XMLHTTP")
     XmlHttp.Open "GET", strURL, True
-    XmlHttp.setRequestHeader "If-Modified-Since", "0"
-    XmlHttp.send
+    XmlHttp.SetRequestHeader "If-Modified-Since", "0"
+    XmlHttp.Send
     stime = Now '获取当前时间
     While XmlHttp.readyState <> 4
         DoEvents
         ntime = Now '获取循环时间
-        If DateDiff("s", stime, ntime) > TIME_OUT Then
+        If DateDiff("s", stime, ntime) > mTimeOut Then
+          Call mLongerTimeOut
           Err.Raise 10001, , "[SunSoft]连接超时"
         End If
         DoEvents
     Wend
-    If LenB(XmlHttp.responseBody) > 0 Then
-        smt = XmlHttp.responseBody
+    Call mShorterTimeOut
+    If LenB(XmlHttp.ResponseBody) > 0 Then
+        smt = XmlHttp.ResponseBody
     Else
         getHtmlStrUTF = ""
         Exit Function
@@ -225,9 +254,9 @@ redo:
     Set req = New WinHttp.WinHttpRequest
     
     req.Open "GET", url, True
-    req.setRequestHeader "If-Modified-Since", "0"
-    req.setRequestHeader "User-Agent", "Mozilla/6.0"
-    req.send
+    req.SetRequestHeader "If-Modified-Since", "0"
+    req.SetRequestHeader "User-Agent", "Mozilla/6.0"
+    req.Send
     If req Is Nothing Then
         GoTo redo
     End If
@@ -236,15 +265,17 @@ redo:
     While canGet = False
         DoEvents
         ntime = Now '获取循环时间
-        If DateDiff("s", stime, ntime) > TIME_OUT Then
+        If DateDiff("s", stime, ntime) > mTimeOut Then
+          Call mLongerTimeOut
           Err.Raise 10001, , "[SunSoft]连接超时"
         End If
     Wend
     If req Is Nothing Then
         GoTo redo
     End If
-    If LenB(req.responseBody) > 0 Then
-        smt = req.responseBody
+    Call mShorterTimeOut
+    If LenB(req.ResponseBody) > 0 Then
+        smt = req.ResponseBody
     Else
         GetHttpCodeUTF = ""
         Exit Function
@@ -262,9 +293,9 @@ redo:
     Set req = New WinHttp.WinHttpRequest
 
     req.Open "GET", url, True
-    req.setRequestHeader "If-Modified-Since", "0"
-    req.setRequestHeader "User-Agent", "Mozilla/6.0"
-    req.send
+    req.SetRequestHeader "If-Modified-Since", "0"
+    req.SetRequestHeader "User-Agent", "Mozilla/6.0"
+    req.Send
     If req Is Nothing Then
         GoTo redo
     End If
@@ -273,15 +304,17 @@ redo:
     While canGet = False
         DoEvents
         ntime = Now '获取循环时间
-        If DateDiff("s", stime, ntime) > TIME_OUT Then
+        If DateDiff("s", stime, ntime) > mTimeOut Then
+          Call mLongerTimeOut
           Err.Raise 10001, , "[SunSoft]连接超时"
         End If
     Wend
     If req Is Nothing Then
         GoTo redo
     End If
-    If LenB(req.responseBody) > 0 Then
-        GetHttpCodeGB = StrConv(req.responseBody, vbUnicode)
+    Call mShorterTimeOut
+    If LenB(req.ResponseBody) > 0 Then
+        GetHttpCodeGB = StrConv(req.ResponseBody, vbUnicode)
     Else
         GetHttpCodeGB = ""
     End If
@@ -291,6 +324,7 @@ End Function
 
 Private Sub Class_Initialize()
     canGet = False
+    mTimeOut = MIN_TIME_OUT
 End Sub
 
 Private Sub req_OnResponseFinished()
@@ -376,3 +410,8 @@ Public Function UTF8_URLEncoding(ByVal szInput As String)
     Next
     UTF8_URLEncoding = szRet
 End Function
+
+Public Property Get TimeOut() As Variant
+  TimeOut = mTimeOut
+End Property
+
