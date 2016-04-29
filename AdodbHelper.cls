@@ -10,7 +10,7 @@ Attribute VB_Name = "AdodbHelper"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 Attribute VB_Ext_KEY = "SavedWithClassBuilder6" ,"Yes"
 Attribute VB_Ext_KEY = "Top_Level" ,"Yes"
 '////////说明////////
@@ -477,6 +477,10 @@ Public Function ExecQueryScalar(ByVal SqlStr As String) As Variant
     ReleaseRecordset tmpRes
 End Function
 
+Public Function SafeParam(ByVal value As String) As String
+  SafeParam = Replace(value, "'", "''")
+End Function
+
 '【内部方法】
 '打开数据库连接
 '<CSCM>
@@ -535,7 +539,7 @@ Private Function GetVarType(ByRef Value As Variant) As ADODB.DataTypeEnum
     Select Case VarType(Value)
 
         Case VbVarType.vbString
-            GetVarType = ADODB.DataTypeEnum.adVarChar
+            GetVarType = ADODB.DataTypeEnum.adVarWChar
 
         Case VbVarType.vbInteger
             GetVarType = ADODB.DataTypeEnum.adSmallInt

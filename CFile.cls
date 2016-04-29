@@ -194,7 +194,28 @@ Public Function WriteToTextFile(ByVal FilePath As String, _
 
 End Function
 
-Public Function WriteLineToTextFile(ByVal FilePath As String, _
+Public Function OverWriteToTextFile(ByVal filePath As String, _
+                                ByVal Content As String) As Boolean
+    On Error Resume Next
+
+    Dim fileId As Long
+
+    fileId = freeFile
+
+    Open filePath For Output As fileId
+      Print #fileId, Content;
+    Close fileId
+
+    If Err.Number > 0 Then
+        OverWriteToTextFile = False
+        Err.Clear
+    Else
+        OverWriteToTextFile = True
+    End If
+
+End Function
+
+Public Function WriteLineToTextFile(ByVal filePath As String, _
                                     ByVal Content As String) As Boolean
   WriteLineToTextFile = WriteToTextFile(FilePath, vbCrLf & Content)
 End Function
@@ -236,9 +257,16 @@ End Function
 Public Sub Delete(ByVal FilePath As String)
   If FileExists(FilePath) Then
     If DeleteFile(FilePath) = 0 Then
-        Err.Raise 11, , "文件删除错误！"
+      Err.Raise 11, , "文件删除错误！"
     End If
   Else
-      Err.Raise 12, , "文件路径不存在！"
+    Err.Raise 12, , "文件路径不存在！"
   End If
+End Sub
+
+Public Sub Touch(ByVal filePath As String)
+  Dim fileNo As Integer
+  fileNo = freeFile
+  Open filePath For Random As fileNo
+  Close fileNo
 End Sub
